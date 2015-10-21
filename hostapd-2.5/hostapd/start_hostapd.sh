@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo restart networking
+#sudo restart networking
 sudo nmcli nm wifi off
 sudo rfkill unblock wlan
 
