@@ -1,8 +1,19 @@
 /*
+ * =====================================================================================
+ *       Filename:  sendData.c 
+ *
+ *    Description:  send packets 
+ *        Version:  1.0
+ *
+ *         Author:  Yaxiong Xie 
+ *         Email :  <xieyaxiongfly@gmail.com>
+ *   Organization:  WANS group @ Nanyang Technological University 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
+ * =====================================================================================
  */
  
 #include <arpa/inet.h>
@@ -21,6 +32,7 @@
 #include <unistd.h>
 #include <errno.h>
 
+/* Define the defult destination MAC address */
 #define DEFAULT_DEST_MAC0	0x00
 #define DEFAULT_DEST_MAC1	0x03
 #define DEFAULT_DEST_MAC2	0x7F
@@ -28,23 +40,22 @@
 #define DEFAULT_DEST_MAC4	0x28
 #define DEFAULT_DEST_MAC5	0x28
  
-#define DEFAULT_IF	"wlan0"
-#define BUF_SIZ		1024
+#define DEFAULT_IF	        "wlan0"
+#define BUF_SIZ	            2048	
  
 int main(int argc, char *argv[])
 {
-	int sockfd;
-    	int i;
-	struct ifreq if_idx;
-	struct ifreq if_mac;
-	int tx_len = 0,Cnt;
-	char sendbuf[BUF_SIZ];
+	int     sockfd;
+    int     i;
+	struct  ifreq if_idx;
+	struct  ifreq if_mac;
+	int     tx_len = 0,Cnt;
+	char    sendbuf[BUF_SIZ];
     unsigned int DstAddr[6];
-	struct ether_header *eh = (struct ether_header *) sendbuf;
-	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
-	struct sockaddr_ll socket_address;
-	char ifName[IFNAMSIZ];
-	u_int8_t data_rate;
+	struct  ether_header *eh = (struct ether_header *) sendbuf;
+	struct  iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
+	struct  sockaddr_ll socket_address;
+	char    ifName[IFNAMSIZ];
 	
     if (argc == 1)
     {
