@@ -9,7 +9,7 @@
  *         Email :  <xieyaxiongfly@gmail.com>
  *   Organization:  WANDS group @ Nanyang Technological University
  *
- *   Copyright (c)  Yaxiong Xie <xieyaxiongfly@gmail.com>
+ *   Copyright (c)  WANDS group @ Nanyang Technological University
  * =====================================================================================
  */
 #include <stdbool.h>

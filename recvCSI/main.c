@@ -11,7 +11,7 @@
  *         Email :  <xieyaxiongfly@gmail.com>
  *   Organization:  WANDS group @ Nanyang Technological University
  *   
- *   Copyright (c)  Yaxiong Xie <xieyaxiongfly@gmail.com>
+ *   Copyright (c)  WANDS group @ Nanyang Technological University
  * =====================================================================================
  */
 #include <stdlib.h>
@@ -114,8 +114,7 @@ int main(int argc, char* argv[])
              * store the csi matrix in the csi buffer
              * with all those data, we can build our own processing function! 
              */
-            porcess_csi(data_buf, csi_status, csi_matrix);
-
+            //porcess_csi(data_buf, csi_status, csi_matrix);   
             
             printf("Recv %dth msg with rate: 0x%02x | payload len: %d\n",total_msg_cnt,csi_status->rate,csi_status->payload_len);
             

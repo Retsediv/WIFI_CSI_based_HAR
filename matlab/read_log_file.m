@@ -7,14 +7,13 @@
 %%
 %%         Author:  Yaxiong Xie 
 %%         Email :  <xieyaxiongfly@gmail.com>
-%%   Organization:  WANS group @ Nanyang Technological University 
+%%   Organization:  WANDS group @ Nanyang Technological University 
 %%
-%%   Copyright (c)  Yaxiong Xie <xieyaxiongfly@gmail.com>
+%%   Copyright (c)  WANDS group @ Nanyang Technological University
 %% =====================================================================================
 %%
 
-% function ret = read_log_file(filename)
-filename = 'log.txt';
+function ret = read_log_file(filename)
 f = fopen(filename, 'rb');
 if (f < 0)
     error('couldn''t open file %s', filename);

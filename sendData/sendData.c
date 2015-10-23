@@ -37,8 +37,8 @@
 #define DEFAULT_DEST_MAC1	0x03
 #define DEFAULT_DEST_MAC2	0x7F
 #define DEFAULT_DEST_MAC3	0xB0
-#define DEFAULT_DEST_MAC4	0x28
-#define DEFAULT_DEST_MAC5	0x28
+#define DEFAULT_DEST_MAC4	0x20
+#define DEFAULT_DEST_MAC5	0x20
  
 #define DEFAULT_IF	        "wlan0"
 #define BUF_SIZ	            2048	
@@ -46,12 +46,12 @@
 int main(int argc, char *argv[])
 {
 	int     sockfd;
-    int     i;
+    	int     i;
 	struct  ifreq if_idx;
 	struct  ifreq if_mac;
 	int     tx_len = 0,Cnt;
 	char    sendbuf[BUF_SIZ];
-    unsigned int DstAddr[6];
+    	unsigned int DstAddr[6];
 	struct  ether_header *eh = (struct ether_header *) sendbuf;
 	struct  iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
 	struct  sockaddr_ll socket_address;

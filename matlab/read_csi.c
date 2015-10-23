@@ -9,7 +9,7 @@
  *         Email :  <xieyaxiongfly@gmail.com>
  *   Organization:  WNADS group @ Nanyang Technological University
  *
- *   Copyright (c)  Yaxiong Xie <xieyaxiongfly@gmail.com>
+ *   Copyright (c)  WANDS group @ Nanyang Technological University
  * =====================================================================================
  */
 #include "mex.h"
