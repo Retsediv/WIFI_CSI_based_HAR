@@ -1,8 +1,9 @@
 %%
 %% =====================================================================================
-%%       Filename:  ar003_csi.h
+%%       Filename:  read_log_file.m 
 %%
-%%    Description:  ar003_csi data structure definiation
+%%    Description:  extract the CSI, payload, and packet status information from the log
+%%                  file
 %%        Version:  1.0
 %%
 %%         Author:  Yaxiong Xie 
