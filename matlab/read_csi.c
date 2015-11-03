@@ -49,18 +49,17 @@ void mexFunction(int nlhs, mxArray *plhs[],
     int  k;
     int  real, imag;
     int  bits_left, nc_idx, nr_idx;
-    unsigned int bitmask, idx, current_data, h_data, h_idx;
     
     /*  check for proper number of arguments */
     if(nrhs!=4) {
-        mexErrMsgIdAndTxt("MIMOToolbox:read_bfee_new:nrhs","Four input required.");
+        mexErrMsgIdAndTxt("MIMOToolbox:read_csi_new:nrhs","Four input required.");
     }
     if(nlhs!=1) {
-        mexErrMsgIdAndTxt("MIMOToolbox:read_bfee_new:nlhs","One output required.");
+        mexErrMsgIdAndTxt("MIMOToolbox:read_csi_new:nlhs","One output required.");
     }
     /*  make sure the input argument is a char array */
     if (!mxIsClass(prhs[0], "uint8")) {
-        mexErrMsgIdAndTxt("MIMOToolbox:read_bfee_new:notBytes","Input must be a char array");
+        mexErrMsgIdAndTxt("MIMOToolbox:read_csi_new:notBytes","Input must be a char array");
     }
   
     local_h = mxGetData(prhs[0]);
