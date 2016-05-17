@@ -194,7 +194,7 @@ void record_csi_payload(unsigned char* buf_addr, csi_struct* csi_status, unsigne
     }
     
     /* extract the CSI and fill the complex matrix */
-    csi_addr = buf_addr + csi_st_len;
+    csi_addr = buf_addr + csi_st_len + 2;
     fill_csi_matrix(csi_addr,nr,nc,num_tones, csi_matrix);
 }
 void  porcess_csi(unsigned char* data_buf, csi_struct* csi_status,COMPLEX(* csi_buf)[3][114]){
