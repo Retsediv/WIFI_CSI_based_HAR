@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
     int         i;
     int         total_msg_cnt,cnt;
     int         log_flag;
+    unsigned char endian_flag;
     u_int16_t   buf_len;
     
     log_flag = 1;
@@ -71,6 +72,12 @@ int main(int argc, char* argv[])
             fclose(fp);
             return 0;
         }
+
+        if(is_big_endian())
+            endian_flag = 0xff;
+        else
+            endian_flag = 0x0;
+        fwrite(&endian_flag,1,1,fp);        
     }
     if (argc > 2){
         printf(" Too many input arguments !\n");

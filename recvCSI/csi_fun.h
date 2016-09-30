@@ -45,6 +45,7 @@ typedef struct
     u_int16_t   buf_len;      /*  data length in buffer */
 }csi_struct;
 
+bool  is_big_endian();
 int   open_csi_device();
 void  close_csi_device(int fd);
 int   read_csi_buf(unsigned char* buf_addr,int fd, int BUFSIZE);
