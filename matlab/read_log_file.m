@@ -43,9 +43,18 @@ ret = cell(ceil(len / 420),1);
 cur = 0;
 count = 0;
 
+%check big/little endian
+endian_code = fread(f,1,'*ubit8');
+if endian_code == 255
+    endian_format = 'ieee-be';
+elseif endian_code == 0
+    endian_format = 'ieee-le';
+else
+    error('There is wrong endian format.');
+end
+
 while cur < (len - 4)
-% 	field_len = fread(f, 1, 'uint16', 0, 'ieee-be');
-    field_len = fread(f, 1, 'uint16', 0, 'ieee-le');
+    field_len = fread(f, 1, 'uint16', 0, endian_format);
 	cur = cur + 2;
     fprintf('Block length is:%d\n',field_len);
 
@@ -53,20 +62,17 @@ while cur < (len - 4)
    		break;
     end
     
-%     timestamp = fread(f, 1, 'uint64', 0, 'ieee-be');
-    timestamp = fread(f, 1, 'uint64', 0, 'ieee-le.l64');
+    timestamp = fread(f, 1, 'uint64', 0, [endian_format '.l64']);
 	csi_matrix.timestamp = timestamp;
 	cur = cur + 8;
 	fprintf('timestamp is %d\n',timestamp);
 
-% 	csi_len = fread(f, 1, 'uint16', 0, 'ieee-be');
-    csi_len = fread(f, 1, 'uint16', 0, 'ieee-le');
+    csi_len = fread(f, 1, 'uint16', 0, endian_format);
 	csi_matrix.csi_len = csi_len;
 	cur = cur + 2;
     fprintf('csi_len is %d\n',csi_len);
 
-%     tx_channel = fread(f, 1, 'uint16', 0, 'ieee-be');
-    tx_channel = fread(f, 1, 'uint16', 0, 'ieee-le');
+    tx_channel = fread(f, 1, 'uint16', 0, endian_format);
 	csi_matrix.channel = tx_channel;
 	cur = cur + 2;
     fprintf('channel is %d\n',tx_channel);
@@ -86,10 +92,6 @@ while cur < (len - 4)
 	cur = cur + 1;
 	fprintf('rate is %x\n',Rate);
     
-%     bandWidth = fread(f, 1, 'uint8=>int');
-% 	csi_matrix.bandWidth = bandWidth;
-% 	cur = cur + 1;
-% 	fprintf('bandWidth is %d\n',bandWidth);
     
     bandWidth = fread(f, 1, 'uint8=>int');
 	csi_matrix.bandWidth = bandWidth;
@@ -140,7 +142,7 @@ while cur < (len - 4)
 %     hwUpload_type = fread(f, 1, 'uint8=>int');
 %     cur = cur + 1;
     
-    payload_len = fread(f, 1, 'uint16', 0, 'ieee-le');
+    payload_len = fread(f, 1, 'uint16', 0, endian_format);
 	csi_matrix.payload_len = payload_len;
 	cur = cur + 2;
     fprintf('payload length: %d\n',payload_len);	
