@@ -25,10 +25,11 @@
 
 #define csi_st_len 23
 /* test and find out the system is big endian or not*/
+//for 16/32/64 system this should be all fine.
 bool is_big_endian(){
-    int a = 0x1234;
-    char b = *(char *)&a;
-    if ( b == 0x12)
+    unsigned int a = 0x1;
+    unsigned char b = *(unsigned char *)&a;
+    if ( b == 0)
     {
         return true;
     }
