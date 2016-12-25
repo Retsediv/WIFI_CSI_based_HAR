@@ -50,7 +50,7 @@ if endian_code == 255
 elseif endian_code == 0
     endian_format = 'ieee-le';
 else
-    error('There is wrong endian format.');
+    error('Wrong endian format.');
 end
 
 while cur < (len - 4)
