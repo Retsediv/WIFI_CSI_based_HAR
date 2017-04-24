@@ -64,7 +64,7 @@ def plot_phases(csi_structs, unwrap=0):
 
 if __name__ == "__main__":
     dirpath = ""
-    filename = ["csi.dat"]
+    filename = ["0_0_1.dat"]
     with PdfPages('out.pdf') as pdf:
         for f in filename:
             print("Plotting ", f)

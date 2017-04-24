@@ -56,13 +56,7 @@ def unpack_csi_struct(f, endianess='>'): # Big-Endian as Default Value
             payload_buf = f.read(csi_inf.payload_len) #payload_len    payload_len
         else:
             payload_buf = 0
-
-        if(DEBUG == 1):
-            print("Block Length", csi_inf.field_len, "\nTimestamp", csi_inf.timestamp,"\nCSI Length", csi_inf.csi_len,
-                    "\nTX Channel", csi_inf.tx_channel, "\nErr Info", csi_inf.err_info, "\nRate", csi_inf.rate,
-                    "\nNoise Floor", csi_inf.noise_floor, "\nBandwidth", csi_inf.bw, "\nNum Tones", csi_inf.num_tones,
-                    "\nNR", csi_inf.nr, "\nNC", csi_inf.nc, "\nrssi", csi_inf.rssi, "\nrssi1", csi_inf.rssi1,
-                    "\nrssi2", csi_inf.rssi2, "\nrssi3", csi_inf.rssi3, "\nPayload Length", csi_inf.payload_len)
+        
         return csi_inf
 
 def read_csi(csi_buf, num_tones, nc, nr, csi_len, endianess):

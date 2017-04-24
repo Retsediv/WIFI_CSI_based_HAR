@@ -23,7 +23,6 @@ from read_csi import *
 def read_log_file(filename, ignore_endian=0, endian="", check_tones=1):
 
     f = open(filename, "rb")
-
     f.seek(0, os.SEEK_END)
     length = f.tell() #File Length
     print ("file length is ", length)
@@ -38,7 +37,7 @@ def read_log_file(filename, ignore_endian=0, endian="", check_tones=1):
             endian="<"
     ret = []
     tones = -1
-    while (f.tell() < length): 
+    while (f.tell() < length):
         try:
             csi_inf = unpack_csi_struct(f, endianess=endian)
             if(tones ==  -1 and check_tones == 1):
