@@ -4,7 +4,7 @@
 # @brief Reading logfiles created by userspace tool
 #
 #
-# Copyright 2016 NovelSense UG
+# Copyright 2017 NovelSense UG
 # Authors: Niklas Saenger
 #
 # NOTICE: All information contained herein is, and remains the
@@ -55,7 +55,7 @@ def read_log_file(filename, ignore_endian=0, endian="", check_tones=1):
     f.close()
     return ret
 if __name__ == "__main__":
-    file = read_log_file("../test_daten/test2/sample_big_endian.dat")
+    file = read_log_file("../../Sandip_Tests/csi.dat")
     print("Done reading")
-    for struct in A:
-        print(A.channel)
+    for struct in file:
+        print(struct.channel)

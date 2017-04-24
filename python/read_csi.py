@@ -24,7 +24,7 @@ import numpy as np
 BITS_PER_BYTE = 8
 BITS_PER_SYMBOL = 10
 bitmask = (1 << BITS_PER_SYMBOL) - 1
-DEBUG = 0
+DEBUG = 1
 class csi_struct: 
     pass
 
@@ -52,13 +52,13 @@ def unpack_csi_struct(f, endianess='>'): # Big-Endian as Default Value
             csi_inf.csi = read_csi(csi_buf, csi_inf.num_tones, csi_inf.nc, csi_inf.nr, csi_inf.csi_len, endianess)
         else:
             csi_inf.csi = 0
-
         if(csi_inf.payload_len > 0):
             payload_buf = f.read(csi_inf.payload_len) #payload_len    payload_len
         else:
             payload_buf = 0
+
         if(DEBUG == 1):
-            print  ("Block Length", csi_inf.field_len, "\nTimestamp", csi_inf.timestamp,"\nCSI Length", csi_inf.csi_len,
+            print("Block Length", csi_inf.field_len, "\nTimestamp", csi_inf.timestamp,"\nCSI Length", csi_inf.csi_len,
                     "\nTX Channel", csi_inf.tx_channel, "\nErr Info", csi_inf.err_info, "\nRate", csi_inf.rate,
                     "\nNoise Floor", csi_inf.noise_floor, "\nBandwidth", csi_inf.bw, "\nNum Tones", csi_inf.num_tones,
                     "\nNR", csi_inf.nr, "\nNC", csi_inf.nc, "\nrssi", csi_inf.rssi, "\nrssi1", csi_inf.rssi1,
