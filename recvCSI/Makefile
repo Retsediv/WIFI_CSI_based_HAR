@@ -1,5 +1,7 @@
 OBJS = csi_fun.o main.o
-CC = gcc
+# CC = gcc
+CC = mips-openwrt-linux-gcc
+
 recv_csi: $(OBJS)
 	$(CC) $(OBJS) -o recv_csi
 csi_fun.o: csi_fun.c csi_fun.h

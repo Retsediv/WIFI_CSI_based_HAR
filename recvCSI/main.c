@@ -14,6 +14,7 @@
  *   Copyright (c)  WANDS group @ Nanyang Technological University
  * =====================================================================================
  */
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -152,9 +153,9 @@ int main(int argc, char* argv[])
              * store the csi matrix in the csi buffer
              * with all those data, we can build our own processing function!
              */
-            //porcess_csi(data_buf, csi_status, csi_matrix);
+//            porcess_csi(data_buf, csi_status, csi_matrix);
 
-            printf("Recv %dth msg with rate: 0x%02x | payload len: %d\n",total_msg_cnt,csi_status->rate,csi_status->payload_len);
+            printf("=== NEW DATA ===\n");
             printf("Recv %dth msg with rate: 0x%02x | payload len: %d\n",total_msg_cnt,csi_status->rate,csi_status->payload_len);
             printf("Timestamp %d\n", csi_status->tstamp);
             printf("Channel: %d\n",csi_status->channel);
@@ -169,7 +170,7 @@ int main(int argc, char* argv[])
             printf("RSSI2: %d\n",csi_status->rssi_1);
             printf("RSSI3: %d\n",csi_status->rssi_2);
             printf("Payload Len: %d\n",csi_status->payload_len);
-            printf("CSI Len: %d\n",csi_status->csi_len);
+            printf("CSI Len: %d\n\n\n",csi_status->csi_len);
             
             buf_len = csi_status->buf_len;
             // Network Stuff
@@ -185,11 +186,11 @@ int main(int argc, char* argv[])
               free(sendbuf);
             }
 
-            /* log the received data for off-line processing */
-            if (log_flag){
-                fwrite(&buf_len,1,2,fp);
-                fwrite(buf_addr,1,buf_len,fp);
-            }
+//            /* log the received data for off-line processing */
+//            if (log_flag){
+//                fwrite(&buf_len,1,2,fp);
+//                fwrite(buf_addr,1,buf_len,fp);
+//            }
         }
     }
     fclose(fp);

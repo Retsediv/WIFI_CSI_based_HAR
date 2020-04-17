@@ -13,6 +13,8 @@
  * =====================================================================================
  */
 #include <stdbool.h>
+#include <sys/types.h>
+
 #define Kernel_CSI_ST_LEN 23 
 typedef struct
 {

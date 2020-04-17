@@ -14,3 +14,4 @@ The setup consists of three devices. Two SoC's and one PC/Notebook
 
 *Troubleshooting*:
 If the packages are not received by the PC there might be issues with the firewall.
+    

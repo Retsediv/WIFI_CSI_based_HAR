@@ -16,12 +16,13 @@
 # unless prior written permission is obtained from NovelSense UG.
 # ------------------------------------------------------------------------------------------
 
-from read_log_file import *
-import random
+from .csi_extraction import read_log_file, read_csi, calc_frequency, calc_phase_angle
+
 import numpy as np
-from read_csi import calc_phase_angle, calc_frequency
+
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+
 
 def plot_phase(csi_struct, unwrap=0):
     plt_y = []
@@ -31,15 +32,16 @@ def plot_phase(csi_struct, unwrap=0):
         freq = calc_frequency(csi_struct.channel, i, csi_struct.num_tones)
         plt_y.append(freq)
         plt_x.append(angle)
-    if(unwrap==1):
+    if unwrap == 1:
         plt_x = np.unwrap(plt_x)
     plt.plot(plt_y, plt_x, '-o')
-    plt.ylim([-np.pi,np.pi])
+    plt.ylim([-np.pi, np.pi])
     pdf.savefig()
     plt.close()
 
+
 def plot_phases(csi_structs, unwrap=0):
-    if(len(csi_structs) == 0):
+    if len(csi_structs) == 0:
         return
 
     x = []
@@ -58,9 +60,10 @@ def plot_phases(csi_structs, unwrap=0):
     x = np.unwrap(x)
     x = np.mean(x, axis=0)
     plt.plot(plt_x, x, '-o')
-    plt.ylim([-6,6])
+    plt.ylim([-6, 6])
     pdf.savefig()
     plt.close()
+
 
 if __name__ == "__main__":
     dirpath = ""
@@ -68,6 +71,6 @@ if __name__ == "__main__":
     with PdfPages('out.pdf') as pdf:
         for f in filename:
             print("Plotting ", f)
-            structs = read_log_file(dirpath + f)[:10] # Plot only 10 packets
+            structs = read_log_file(dirpath + f)[:10]  # Plot only 10 packets
             print(len(structs), " Structs found")
             plot_phases(structs, unwrap=1)

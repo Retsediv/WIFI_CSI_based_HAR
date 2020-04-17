@@ -1,4 +1,5 @@
-CC = gcc
+# CC = gcc
+CC = mips-openwrt-linux-gcc
 
 send_data: sendData.c
 	$(CC) -o send_Data sendData.c
