@@ -19,18 +19,23 @@
 
 import io
 
+import cv2
 import numpy as np
 import PyQt4.uic as uic  # need this to load ui file from QT Creator
 from PyQt4 import QtNetwork
 from pyqtgraph.Qt import QtCore, QtGui
 
-from csi_extraction import unpack_csi_struct
+from csi_extraction import unpack_csi_struct, calc_phase_angle
+from csi_extraction import calibrate_amplitude, calibrate_phase
+from copy import deepcopy
 import csv
 
 app = QtGui.QApplication([])
 
+PATH_TO_DATA_FOLDER = "./experiments/first_test"
 
 class UDP_listener():
+    packet_counter = 0
 
     def __init__(self, carrier, amplitudes, sock, form):
         self.carrier = carrier
@@ -44,94 +49,83 @@ class UDP_listener():
             datagram, host, port = self.sock.readDatagram(self.sock.pendingDatagramSize())
             f = io.BytesIO(datagram)
             csi_inf = unpack_csi_struct(f)
-            if (csi_inf.csi != 0):
-                self.calc(csi_inf)
 
-    # def calc(self, csi_inf):
-    #     channel = csi_inf.channel
-    #     carriers = csi_inf.num_tones
-    #     carrier = []
-    #     phase = []
-    #     amplitude = []
-    #
-    #     phase0_0 = []
-    #     phase0_1 = []
-    #     phase1_0 = []
-    #     phase1_1 = []
-    #
-    #     for i in range(0, carriers):
-    #         if i == 0:
-    #             print("=== CSI FULL DATA ===")
-    #             print(csi_inf.csi[i])
-    #             print("\n\n")
-    #
-    #         p = csi_inf.csi[i][0][0]
-    #         imag = p.imag
-    #         real = p.real
-    #         peak_amplitude = np.sqrt(np.power(real, 2) + np.power(imag, 2))
-    #         carrier.append(i)
-    #         amplitude.append(peak_amplitude)
-    #         phase.append(np.angle(p))
-    #
-    #     self.form.carrier = carrier
-    #     self.form.amplitude = ((np.array(amplitude) - np.min(amplitude)) / (
-    #             np.max(amplitude) - np.min(amplitude)) * csi_inf.rssi)  # normalized phase
-    #     self.form.phase = np.unwrap(phase)
+            if csi_inf.csi != 0:  # get csi from data packet, save and process for further visualization
+                raw_peak_amplitudes, raw_phases, carriers_indexes = self.get_csi_raw_data(csi_inf)
 
-    def calc(self, csi_inf):
+                self.calc(raw_peak_amplitudes, raw_phases, carriers_indexes)
+                self.save_csi_to_file(raw_peak_amplitudes, raw_phases, carriers_indexes)
+                self.make_photo_and_save()
+
+    @staticmethod
+    def get_csi_raw_data(csi_inf):
         channel = csi_inf.channel
-        carriers = csi_inf.num_tones
-        carrier = []  # just indexes from 0 to "csi_inf.num_tone"
+        carriers_num = csi_inf.num_tones
+        carriers = []  # just indexes from 0 to "csi_inf.num_tone"
 
-        phase = [[], [], [], []]
-        amplitude = [[], [], [], []]
+        raw_phases, raw_peak_amplitudes = [], []
 
-        for i in range(0, carriers):
+        for i in range(0, carriers_num):
+            peak_amplitudes, phases = [], []
             for enum_index, (tr_i, rc_i) in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
                 p = csi_inf.csi[i][tr_i][rc_i]
-                imag = p.imag
-                real = p.real
-                peak_amplitude = np.sqrt(np.power(real, 2) + np.power(imag, 2))
-                phase[enum_index].append(np.angle(p))
-                amplitude[enum_index].append(peak_amplitude)
+                imag, real = p.imag, p.real
 
-            carrier.append(i)
+                peak_amplitude = np.sqrt(np.power(real, 2) + np.power(imag, 2))  # calculate peak amplitude
+                phase_angle = calc_phase_angle(csi_inf.csi[i][tr_i][rc_i])  # calculate phase angle
 
-        self.form.carrier = carrier
+                phases.append(phase_angle)
+                peak_amplitudes.append(peak_amplitude)
+
+            raw_phases.append(phases)
+            raw_peak_amplitudes.append(peak_amplitudes)
+            carriers.append(i)
+
+        return raw_peak_amplitudes, raw_phases, carriers
+
+    def calc(self, raw_peak_amplitudes, raw_phases, carriers_indexes):  # used for visualization only
+        amplitude, phase = deepcopy(raw_peak_amplitudes), deepcopy(raw_phases)
+
+        # Update form carriers indexes
+        self.form.carrier = carriers_indexes
+
+        # Calibrate amplitude and update form amplitude values
         for i in range(4):
-            amplitude[i] = ((np.array(amplitude[i]) - np.min(amplitude[i])) / (
-                    np.max(amplitude[i]) - np.min(amplitude[i])) * csi_inf.rssi)  # normalized phase
+            amplitude[i] = calibrate_amplitude(amplitude[i], 1)
         self.form.amplitude = amplitude
 
-        # Calibrate phases
-        final_phases = []
+        # Calibrate phase and update form phase values
+        for i in range(4):
+            phase[i] = calibrate_phase(phase[i])
 
-        for p_i in range(4):
-            current_phase = phase[p_i]
-            subcarries = 56
-            calibrated_phase = [0] * len(current_phase)
-            m = range((-1) * subcarries + 2, subcarries - 2)
-            tp = [0] * len(current_phase)
-            diff = 0
-            mu = np.pi
-            tp[0] = current_phase[0]
+        self.form.phase = phase
 
-            for i in range(1, len(current_phase)):
-                if current_phase[i] - current_phase[i - 1] > mu:
-                    diff += 1
+    @staticmethod
+    def make_photo_and_save():
+        cam = cv2.VideoCapture(0)
+        ret, frame = cam.read()
 
-                tp[i] = current_phase[i] - diff * 2 * np.pi
+        img_name = "opencv_frame_{}.png".format(UDP_listener.packet_counter)
+        path_to_image = "{}/{}/{}".format(PATH_TO_DATA_FOLDER, "images", img_name)
+        cv2.imwrite(path_to_image, frame)
 
-            k = (tp[-1] - tp[0]) / (m[len(current_phase) - 1] - m[0])
-            b = sum(tp) / len(current_phase)
+        UDP_listener.packet_counter += 1
+        print("{} written!".format(path_to_image))
 
-            for i in range(len(current_phase)):
-                calibrated_phase[i] = tp[i] - k * m[i] - b
+        cam.release()
+        cv2.destroyAllWindows()
 
-            final_phases.append(calibrated_phase)
+    @staticmethod
+    def save_csi_to_file(raw_peak_amplitudes, raw_phases, carriers):
+        print("Saving CSI data to .csv file...")
 
-        self.form.phase = final_phases
-        # self.form.phase = np.unwrap(phase)
+        filename_csv = "data.csv"
+        path_to_csv_file = "{}/{}".format(PATH_TO_DATA_FOLDER, filename_csv)
+
+        with open(path_to_csv_file, 'a', newline='\n') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow([*carriers, *raw_peak_amplitudes[0], *raw_peak_amplitudes[1], *raw_peak_amplitudes[2],
+                             *raw_peak_amplitudes[3], *raw_phases[0], *raw_phases[1], *raw_phases[2], *raw_phases[3]])
 
 
 class UI(QtGui.QWidget):
@@ -178,16 +172,6 @@ class UI(QtGui.QWidget):
         self.amp = amp
         self.box_phase = phase
 
-    def save_to_file(self, carrier, phase, amplitude):
-        # print("save to file")
-
-        # TODO: photo shooting
-        filename_csv = "./ruh.csv"
-        with open(filename_csv, 'a', newline='\n') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow([*phase[0], *phase[1], *phase[2], *phase[3], *amplitude[0], *amplitude[1], *amplitude[2],
-                             *amplitude[3]])
-
     @QtCore.pyqtSlot()
     def update_plots(self):
         # print("UPDATE slots!")
@@ -202,8 +186,6 @@ class UI(QtGui.QWidget):
         self.penPhase0_1.setData(self.carrier, self.phase[1])
         self.penPhase1_0.setData(self.carrier, self.phase[2])
         self.penPhase1_1.setData(self.carrier, self.phase[3])
-
-        self.save_to_file(self.carrier, self.phase, self.amplitude)
 
         self.process_events()  # force complete redraw for every plot
 
