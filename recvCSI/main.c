@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
          */
         log_flag  = 0;
         printf("/**************************************/\n");
-        printf("/*   Usage: recv_csi  <udp server(IP)> <udp port> <output_file>    */\n");
+        printf("/*   Usage: recv_csi_nolog_better_output  <udp server(IP)> <udp port> <output_file>    */\n");
         printf("/**************************************/\n");
     }
     if (2 == argc || argc == 4){
@@ -93,8 +93,10 @@ int main(int argc, char* argv[])
             endian_flag = 0xff;
         else
             endian_flag = 0x0;
+
         fwrite(&endian_flag,1,1,fp);
     }
+
     if(argc == 3 || argc == 4) {
       clientSocket = socket(PF_INET, SOCK_DGRAM, 0);
       if(clientSocket == -1) {
@@ -155,23 +157,22 @@ int main(int argc, char* argv[])
              */
 //            porcess_csi(data_buf, csi_status, csi_matrix);
 
-            printf("=== NEW DATA ===\n");
             printf("Recv %dth msg with rate: 0x%02x | payload len: %d\n",total_msg_cnt,csi_status->rate,csi_status->payload_len);
             printf("Timestamp %d\n", csi_status->tstamp);
-            printf("Channel: %d\n",csi_status->channel);
-            printf("Bandwidth: %d\n",csi_status->chanBW);
-            printf("Rate: %d\n",csi_status->rate);
-            printf("NR: %d\n",csi_status->nr);
-            printf("NC: %d\n",csi_status->nc);
-            printf("Tones: %d\n",csi_status->num_tones);
-            printf("Phyerr: %d\n",csi_status->phyerr);
-            printf("RSSI0: %d\n",csi_status->rssi);
-            printf("RSSI1: %d\n",csi_status->rssi_0);
-            printf("RSSI2: %d\n",csi_status->rssi_1);
-            printf("RSSI3: %d\n",csi_status->rssi_2);
-            printf("Payload Len: %d\n",csi_status->payload_len);
+//            printf("Channel: %d\n",csi_status->channel);
+//            printf("Bandwidth: %d\n",csi_status->chanBW);
+//            printf("Rate: %d\n",csi_status->rate);
+//            printf("NR: %d\n",csi_status->nr);
+//            printf("NC: %d\n",csi_status->nc);
+//            printf("Tones: %d\n",csi_status->num_tones);
+//            printf("Phyerr: %d\n",csi_status->phyerr);
+//            printf("RSSI0: %d\n",csi_status->rssi);
+//            printf("RSSI1: %d\n",csi_status->rssi_0);
+//            printf("RSSI2: %d\n",csi_status->rssi_1);
+//            printf("RSSI3: %d\n",csi_status->rssi_2);
+//            printf("Payload Len: %d\n",csi_status->payload_len);
             printf("CSI Len: %d\n\n\n",csi_status->csi_len);
-            
+
             buf_len = csi_status->buf_len;
             // Network Stuff
             if(argc == 3 || argc == 4) {

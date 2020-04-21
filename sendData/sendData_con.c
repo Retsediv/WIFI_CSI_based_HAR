@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
   while(1)
   {
         /* you set the time interval between two transmitting packets
-         * for example, here we set it to 50 microseconds
+         * for example, here we set it to 100 microseconds
          * set to 0 if you don't need it
          */
     if (usleep(Cnt) == -1){

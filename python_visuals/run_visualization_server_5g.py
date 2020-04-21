@@ -34,6 +34,7 @@ app = QtGui.QApplication([])
 
 # cam = cv2.VideoCapture(0)
 PATH_TO_DATA_FOLDER = "./experiments/tmp"
+# PATH_TO_DATA_FOLDER = "./experiments/tmp"
 
 
 class UDP_listener():
@@ -71,8 +72,9 @@ class UDP_listener():
         print("channel: ", channel)
         print("carriers_num: ", carriers_num)
 
-        antenna_pairs = [(0, 0), (0, 1), (1, 0), (1, 1)]  # for 5 -> [(0, 0), ...]
-        raw_phases, raw_peak_amplitudes = [[], [], [], []], [[], [], [], []]
+        # antenna_pairs = [(0, 0), (0, 1), (1, 0), (1, 1)]  # for 2 antennas
+        antenna_pairs = [(0, 0)]  # for 1 antenna
+        raw_phases, raw_peak_amplitudes = [[] * len(antenna_pairs)], [[] * len(antenna_pairs)]
 
         for i in range(0, carriers_num):
             for enum_index, (tr_i, rc_i) in enumerate(antenna_pairs):
@@ -126,8 +128,9 @@ class UDP_listener():
 
         with open(path_to_csv_file, 'a', newline='\n') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow([*carriers, *raw_peak_amplitudes[0], *raw_peak_amplitudes[1], *raw_peak_amplitudes[2],
-                             *raw_peak_amplitudes[3], *raw_phases[0], *raw_phases[1], *raw_phases[2], *raw_phases[3]])
+            # writer.writerow([*carriers, *raw_peak_amplitudes[0], *raw_peak_amplitudes[1], *raw_peak_amplitudes[2],
+            #                  *raw_peak_amplitudes[3], *raw_phases[0], *raw_phases[1], *raw_phases[2], *raw_phases[3]])
+            writer.writerow([*carriers, *raw_peak_amplitudes[0], *raw_phases[0]])
 
 
 class UI(QtGui.QWidget):
@@ -150,7 +153,7 @@ class UI(QtGui.QWidget):
         amp.setLabel('bottom', 'Carrier', units='')
         amp.setLabel('left', 'Amplitude', units='')
         amp.setYRange(0, 1, padding=0)  # for normalized amp values, prev range: 0, 90
-        amp.setXRange(0, 56, padding=0)
+        amp.setXRange(0, 114, padding=0)
         self.penAmp0_0 = amp.plot(pen={'color': (200, 0, 0), 'width': 3})
         self.penAmp0_1 = amp.plot(pen={'color': (200, 200, 0), 'width': 3})
         self.penAmp1_0 = amp.plot(pen={'color': (0, 0, 200), 'width': 3})
@@ -162,7 +165,7 @@ class UI(QtGui.QWidget):
         phase.setLabel('bottom', 'Carrier', units='')
         phase.setLabel('left', 'Phase', units='')
         phase.setYRange(-np.pi, np.pi, padding=0)
-        phase.setXRange(0, 56, padding=0)
+        phase.setXRange(0, 114, padding=0)
         self.penPhase0_0 = phase.plot(pen={'color': (200, 0, 0), 'width': 3})
         self.penPhase0_1 = phase.plot(pen={'color': (200, 200, 0), 'width': 3})
         self.penPhase1_0 = phase.plot(pen={'color': (0, 0, 200), 'width': 3})
@@ -179,14 +182,14 @@ class UI(QtGui.QWidget):
     def update_plots(self):
         if len(self.amplitude) and len(self.amplitude[0]):
             self.penAmp0_0.setData(self.carrier, self.amplitude[0])
-            self.penAmp0_1.setData(self.carrier, self.amplitude[1])
-            self.penAmp1_0.setData(self.carrier, self.amplitude[2])
-            self.penAmp1_1.setData(self.carrier, self.amplitude[3])
+            # self.penAmp0_1.setData(self.carrier, self.amplitude[1])
+            # self.penAmp1_0.setData(self.carrier, self.amplitude[2])
+            # self.penAmp1_1.setData(self.carrier, self.amplitude[3])
 
             self.penPhase0_0.setData(self.carrier, self.phase[0])
-            self.penPhase0_1.setData(self.carrier, self.phase[1])
-            self.penPhase1_0.setData(self.carrier, self.phase[2])
-            self.penPhase1_1.setData(self.carrier, self.phase[3])
+            # self.penPhase0_1.setData(self.carrier, self.phase[1])
+            # self.penPhase1_0.setData(self.carrier, self.phase[2])
+            # self.penPhase1_1.setData(self.carrier, self.phase[3])
 
         self.process_events()  # force complete redraw for every plot
 
