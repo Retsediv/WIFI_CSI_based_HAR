@@ -12,3 +12,5 @@ venv/*
 
 ./recvCSI/*.o
 ./sendData/*.o
+/python_visuals/dataset
+/python_visuals/experiments
