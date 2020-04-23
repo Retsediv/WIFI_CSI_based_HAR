@@ -12,5 +12,5 @@ venv/*
 
 ./recvCSI/*.o
 ./sendData/*.o
-/python_visuals/dataset
-/python_visuals/experiments
+/data_retrieval_and_analysis/dataset
+/data_retrieval_and_analysis/experiments
