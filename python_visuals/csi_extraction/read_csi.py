@@ -73,10 +73,11 @@ def read_csi(csi_buf, num_tones, nc, nr, csi_len, endianess):
     cur_data = struct.unpack(endianess + 'B', buf.read(1))[0]  # Read 16Bits at a Time
     cur_data += (struct.unpack(endianess + 'B', buf.read(1))[0] << BITS_PER_BYTE)
 
-    # print("num_tones: ", num_tones)
-    # print("nc: ", nc)
-    # print("nr: ", nr)
-    # print()
+    print("read csi")
+    print("num_tones: ", num_tones)
+    print("nc: ", nc)
+    print("nr: ", nr)
+    print()
 
     for i in range(0, num_tones):
         tones = []
@@ -113,6 +114,8 @@ def read_csi(csi_buf, num_tones, nc, nr, csi_len, endianess):
                 A.append(complex(real, imag))
             tones.append(A)
         csi.append(tones)
+
+        # print("csi: ", csi)
     return csi
 
 

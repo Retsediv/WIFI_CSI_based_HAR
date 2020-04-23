@@ -6,3 +6,9 @@
 .idea/*
 venv/
 venv/*
+
+*/*.o
+*.o
+
+./recvCSI/*.o
+./sendData/*.o
