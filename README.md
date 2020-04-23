@@ -1,13 +1,82 @@
-This repository is a fork from the Atheros-CSI-Tool. The following changes were made to the original:
-  * Added [python](https://github.com/NovelSense/Atheros-CSI-Tool-UserSpace-APP/tree/master/python) folder: It contains scripts to plot and live visualize the csi data.
-  * [recvCSI](https://github.com/NovelSense/Atheros-CSI-Tool-UserSpace-APP/tree/master/recvCSI): Modified the recvCSI tool to send the received CSI packages to the live visualization script.
-  * [sendData](https://github.com/NovelSense/Atheros-CSI-Tool-UserSpace-APP/tree/master/sendData): Modified the sendCSI tool to send in a continious time intervall
+# Human Activity Recognition (HAR) based on WiFi CSI data
 
----
-The user-space applications for our Atheros-CSI-TOOL
+One Paragraph of project description goes here
 
-Please visit our maintainance page http://pdcc.ntu.edu.sg/wands/Atheros/ for detailed infomration.
+Link to the thesis: ...
 
-If you want more details on how to use this tool, please request the documentation http://pdcc.ntu.edu.sg/wands/Atheros/install/install_info.html.
+## Getting Started
 
-Change Log, we now support one transmitter multiple receivers at the same time. One packet transmitted can be simultaneously received by multiple receivers and the CSI will be calculated accordingly. More detail can be found from our maintainance page. http://pdcc.ntu.edu.sg/wands/Atheros/
+How to setup WiFi routers
+
+RecvData, SendData compilation
+
+How to run on routers
+
+How to run visualization and data retrieval script
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+What things you need to install the software and how to install them
+
+```
+Give examples
+```
+
+
+### Installing
+
+A step by step series of examples that tell you how to get a development env running
+
+Say what the step will be
+
+```
+Give the example
+```
+
+And repeat
+
+```
+until finished
+```
+
+End with an example of getting some data out of the system or using it for a little demo
+
+
+### Dataset
+
+How it was collected? Some info about it...
+
+Links to the dataset 
+
+### Experiments
+
+General info about experiments
+
+Links to experiments
+
+### Results
+
+Some info about results...
+
+charts, plots, ...
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Authors
+
+* **Andrew Zhuravchak** - [Andrew](https://github.com/Retsedivs)
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* This repository is a fork from the [Atheros-CSI-Tool-UserSpace-APP](https://github.com/NovelSense/Atheros-CSI-Tool-UserSpace-APP) 
+  which is based on [Atheros-CSI-Tool](https://github.com/xieyaxiongfly/Atheros-CSI-Tool).
+* [RF-pose](http://rfpose.csail.mit.edu/) for inspiration for doing this work
