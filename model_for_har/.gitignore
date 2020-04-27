@@ -85,3 +85,6 @@ out
 gen
 dataset/
 dataset/*
+saved_models/
+saved_models/*
+yolo_data/yolov3.weights
