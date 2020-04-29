@@ -1,100 +1,131 @@
+import logging
+
 import torch
 from torch import nn
-from torch.nn import functional as F
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 
 from dataset import CSIDataset
-from models import LSTMClassifier
-from schedulers import cosine, CyclicLR
-
+from metrics import get_train_metric
+from models import LSTMClassifier, FCNBaseline
 from tqdm import tqdm
 
-train_dataset = CSIDataset([
-    "./dataset/bedroom_lviv/1",
-    # "./dataset/bedroom_lviv/2",
-    # "./dataset/bedroom_lviv/3",
-    # "./dataset/vitalnia_lviv/1/",
-    # "./dataset/vitalnia_lviv/2/",
-    # "./dataset/vitalnia_lviv/3/",
-    # "./dataset/vitalnia_lviv/4/"
-])
+logging.basicConfig(level=logging.INFO)
 
-val_dataset = CSIDataset([
-    "./dataset/bedroom_lviv/4",
-    # "./dataset/vitalnia_lviv/5/"
-])
+# Cuda support
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
 
-BATCH_SIZE = 64
+logging.info("Device: {}".format(device))
 
-trn_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=1)
-val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=1)
-
-input_dim = 912
+# LSTM Model parameters
+input_dim = 912  # 114 subcarriers * 4 antenna_pairs * 2 (amplitude + phase)
 hidden_dim = 256
-layer_dim = 3
+layer_dim = 1
 output_dim = 7
-seq_dim = 1
+dropout_rate = 0.0
+bidirectional = True
+SEQ_DIM = 1028
 
-lr = 0.0005
-n_epochs = 10
-iterations_per_epoch = len(trn_dl)
-best_acc = 0
-patience, trials = 100, 0
+BATCH_SIZE = 4
+EPOCHS_NUM = 50
+LEARNING_RATE = 0.00146
 
-model = LSTMClassifier(input_dim, hidden_dim, layer_dim, output_dim)
-model = model.cuda().double()
+class_weights = torch.Tensor([0.113, 0.439, 0.0379, 0.1515, 0.0379, 0.1212, 0.1363]).double().to(device)
+class_weights_inv = 1 / class_weights
+print("class_weights_inv: ", class_weights_inv)
 
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.RMSprop(model.parameters(), lr=lr)
-scheduler = CyclicLR(optimizer, cosine(t_max=iterations_per_epoch * 2, eta_min=lr / 100))
 
-# training loop
-print('Start model training')
+def load_data():
+    train_dataset = CSIDataset([
+        "./dataset/bedroom_lviv/1",
+        # "./dataset/bedroom_lviv/2",
+        # "./dataset/bedroom_lviv/3",
+        # "./dataset/vitalnia_lviv/1/",
+        # "./dataset/vitalnia_lviv/2/",
+        # "./dataset/vitalnia_lviv/3/",
+        # "./dataset/vitalnia_lviv/4/"
+    ], SEQ_DIM)
 
-for epoch in range(1, n_epochs + 1):
+    val_dataset = CSIDataset([
+        "./dataset/bedroom_lviv/4",
+        # "./dataset/vitalnia_lviv/5/"
+    ], SEQ_DIM)
 
-    model.train()
-    for i, (x_batch, y_batch) in tqdm(enumerate(trn_dl), total=len(trn_dl), desc="Training epoch: "):
+    trn_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+    val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
 
-        if x_batch.shape[0] != BATCH_SIZE:  # TODO: fix this by padding sequences
-            continue
+    return trn_dl, val_dl
 
-        optimizer.zero_grad()
 
-        x_batch, y_batch = x_batch.cuda(), y_batch.cuda()
-        out = model(x_batch)
-        loss = criterion(out, y_batch)
+def train():
+    patience, trials, best_acc = 100, 0, 0
+    trn_dl, val_dl = load_data()
 
-        loss.backward()
-        optimizer.step()
-        scheduler.step()
+    # model = FCNBaseline(SEQ_DIM, output_dim)
+    model = LSTMClassifier(input_dim, hidden_dim, layer_dim, output_dim, dropout_rate, bidirectional)
+    model = model.double().to(device)
 
-    model.eval()
-    correct, total = 0, 0
-    for x_val, y_val in tqdm(val_dl, total=len(val_dl), desc="Validation epoch: "):
-        x_val, y_val = [t.cuda() for t in (x_val, y_val)]
-        if x_val.shape[0] != BATCH_SIZE:  # TODO: fix this by padding sequences
-            continue
+    criterion = nn.CrossEntropyLoss(weight=class_weights_inv)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = ReduceLROnPlateau(optimizer)
 
-        out = model(x_val)
+    # training loop
+    logging.info("Start model training")
 
-        preds = F.log_softmax(out, dim=1).argmax(dim=1)
-        print("preds: ", preds)
-        total += y_val.size(0)
-        correct += (preds == y_val).sum().item()
+    for epoch in range(1, EPOCHS_NUM + 1):
+        # h = model.init_hidden(BATCH_SIZE)
 
-    acc = correct / total
+        model.train()
+        # model.zero_grad()
 
-    # if epoch % 5 == 0:
-    print(f'Epoch: {epoch:3d}. Loss: {loss.item():.4f}. Acc.: {acc:2.2%}')
+        for i, (x_batch, y_batch) in tqdm(enumerate(trn_dl), total=len(trn_dl), desc="Training epoch: "):
+            if x_batch.size(0) != BATCH_SIZE:
+                continue
 
-    if acc > best_acc:
-        trials = 0
-        best_acc = acc
-        torch.save(model.state_dict(), 'saved_models/best.pth')
-        print(f'Epoch {epoch} best model saved with accuracy: {best_acc:2.2%}')
-    else:
-        trials += 1
-        if trials >= patience:
-            print(f'Early stopping on epoch {epoch}')
-            break
+            x_batch, y_batch = x_batch.double().to(device), y_batch.double().to(device)
+
+            # Forward pass
+            out = model(x_batch)
+
+            # print("y_batch: ", y_batch.shape)
+            # print("out: ", out.shape)
+            #
+            # print("y_batch.view: ", y_batch.view(y_batch.size(0) * y_batch.size(1)).shape)
+            # print("out.view: ", out.view(out.size(0) * out.size(1), out.size(2)).shape)
+            # print("\n")
+
+            # loss = criterion(out, y_batch.long())
+            loss = criterion(out.view(out.size(0) * out.size(1), out.size(2)), y_batch.view(y_batch.size(0) * y_batch.size(1)).long())
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # Backward and optimize
+            loss.backward()
+            optimizer.step()
+
+        val_loss, val_correct, val_total, val_acc = get_train_metric(model, val_dl, criterion, BATCH_SIZE)
+        train_loss, train_correct, train_total, train_acc = get_train_metric(model, trn_dl, criterion, BATCH_SIZE)
+
+        logging.info(f'Epoch: {epoch:3d} |'
+                     f' Validation Loss: {val_loss:.2f}, Validation Acc.: {val_acc:2.2%}, '
+                     f'Train Loss: {train_loss:.2f}, Train Acc.: {train_acc:2.2%}'
+                     )
+
+        if val_acc > best_acc:
+            trials = 0
+            best_acc = val_acc
+            torch.save(model.state_dict(), 'saved_models/simple_lstm_best.pth')
+            logging.info(f'Epoch {epoch} best model saved with accuracy: {best_acc:2.2%}')
+        else:
+            trials += 1
+            if trials >= patience:
+                logging.info(f'Early stopping on epoch {epoch}')
+                break
+
+        scheduler.step(val_loss)
+
+
+if __name__ == '__main__':
+    train()

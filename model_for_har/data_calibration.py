@@ -67,3 +67,8 @@ def calibrate_amplitude(amplitudes, rssi=1):
 
     amplitudes = np.array(amplitudes)
     return ((amplitudes - np.min(amplitudes)) / (np.max(amplitudes) - np.min(amplitudes))) * rssi
+
+
+def calibrate_amplitude_custom(amplitudes, min_val, max_val, rssi=1):
+    amplitudes = np.array(amplitudes)
+    return ((amplitudes - min_val) / (max_val - min_val)) * rssi

@@ -6,7 +6,7 @@ import pandas as pd
 
 from torch.utils.data import Dataset, DataLoader
 
-from data_calibration import calibrate_phase, calibrate_amplitude
+from data_calibration import calibrate_amplitude_custom, calibrate_phase, calibrate_amplitude
 
 DATASET_FOLDER = "../dataset"
 DATA_ROOMS = ["bedroom_lviv", "parents_home", "vitalnia_lviv"]
@@ -14,6 +14,9 @@ DATA_SUBROOMS = [["1", "2", "3", "4"], ["1"], ["1", "2", "3", "4", "5"]]
 
 SUBCARRIES_NUM_TWO_HHZ = 56
 SUBCARRIES_NUM_FIVE_HHZ = 114
+
+PHASE_MIN, PHASE_MAX = 3.1389, 3.1415
+AMP_MIN, AMP_MAX = 0.0, 577.6582
 
 
 def read_csi_data_from_csv(path_to_csv, is_five_hhz=False, antenna_pairs=4):
@@ -62,8 +65,8 @@ def read_all_data_from_files(paths, is_five_hhz=True, antenna_pairs=4):
     :return: amplitudes, phases, labels all of shape (data len, num of subcarriers)
     """
 
-    final_amplitudes, final_phases, final_labels = np.empty((0, antenna_pairs*SUBCARRIES_NUM_FIVE_HHZ)), \
-                                                   np.empty((0, antenna_pairs*SUBCARRIES_NUM_FIVE_HHZ)), \
+    final_amplitudes, final_phases, final_labels = np.empty((0, antenna_pairs * SUBCARRIES_NUM_FIVE_HHZ)), \
+                                                   np.empty((0, antenna_pairs * SUBCARRIES_NUM_FIVE_HHZ)), \
                                                    np.empty((0))
 
     for index, path in enumerate(paths):
@@ -92,34 +95,60 @@ def read_all_data(is_five_hhz=True, antenna_pairs=4):
 class CSIDataset(Dataset):
     """CSI Dataset."""
 
-    def __init__(self, csv_files):
+    def __init__(self, csv_files, window_size=32):
         self.amplitudes, self.phases, self.labels = read_all_data_from_files(csv_files)
 
-        self.phases = calibrate_phase(self.phases)
-        self.amplitudes = calibrate_amplitude(self.amplitudes)
+        self.amplitudes[:, 0 * SUBCARRIES_NUM_FIVE_HHZ:1 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_amplitude(
+            self.amplitudes[:, 0 * SUBCARRIES_NUM_FIVE_HHZ:1 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.amplitudes[:, 1 * SUBCARRIES_NUM_FIVE_HHZ:2 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_amplitude(
+            self.amplitudes[:, 1 * SUBCARRIES_NUM_FIVE_HHZ:2 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.amplitudes[:, 2 * SUBCARRIES_NUM_FIVE_HHZ:3 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_amplitude(
+            self.amplitudes[:, 2 * SUBCARRIES_NUM_FIVE_HHZ:3 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.amplitudes[:, 3 * SUBCARRIES_NUM_FIVE_HHZ:4 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_amplitude(
+            self.amplitudes[:, 3 * SUBCARRIES_NUM_FIVE_HHZ:4 * SUBCARRIES_NUM_FIVE_HHZ])
+
+        self.phases[:, 0 * SUBCARRIES_NUM_FIVE_HHZ:1 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_phase(
+            self.phases[:, 0 * SUBCARRIES_NUM_FIVE_HHZ:1 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.phases[:, 1 * SUBCARRIES_NUM_FIVE_HHZ:2 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_phase(
+            self.phases[:, 1 * SUBCARRIES_NUM_FIVE_HHZ:2 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.phases[:, 2 * SUBCARRIES_NUM_FIVE_HHZ:3 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_phase(
+            self.phases[:, 2 * SUBCARRIES_NUM_FIVE_HHZ:3 * SUBCARRIES_NUM_FIVE_HHZ])
+        self.phases[:, 3 * SUBCARRIES_NUM_FIVE_HHZ:4 * SUBCARRIES_NUM_FIVE_HHZ] = calibrate_phase(
+            self.phases[:, 3 * SUBCARRIES_NUM_FIVE_HHZ:4 * SUBCARRIES_NUM_FIVE_HHZ])
 
         self.label_keys = list(set(self.labels))
         self.class_to_idx = {
-            self.label_keys[0]: 0,
-            self.label_keys[1]: 1,
-            self.label_keys[2]: 2,
-            self.label_keys[3]: 3,
-            self.label_keys[4]: 4,
-            self.label_keys[5]: 5,
-            self.label_keys[6]: 6
+            "standing": 0,
+            "walking": 1,
+            "get_down": 2,
+            "sitting": 3,
+            "get_up": 4,
+            "lying": 5,
+            "no_person": 6
         }
+        self.idx_to_class = {v: k for k, v in self.class_to_idx.items()}
 
-        self.window = 16
+        self.window = window_size
+        if window_size == -1:
+            self.window = self.labels.shape[0] - 1
 
     def __getitem__(self, idx):
-        all_xs = []
+        if self.window == 0:
+            return np.append(self.amplitudes[idx], self.phases[idx]), self.class_to_idx[
+                self.labels[idx + self.window - 1]]
 
-        for i in range(idx, idx + self.window):
-            all_xs.append(np.append(self.amplitudes[idx], self.phases[idx]))
+        all_xs, all_ys = [], []
 
-        y = self.class_to_idx[self.labels[idx + self.window - 1]]
+        # print("call __getitem__")
+        # print("idx: ", idx)
+        # print("self.window: ", self.window)
 
-        return np.array(all_xs), y
+        for index in range(idx, idx + self.window):
+            # print("i: ", index)
+            all_xs.append(np.append(self.amplitudes[index], self.phases[index]))
+            all_ys.append(self.class_to_idx[self.labels[index]])
+
+        return np.array(all_xs), np.array(all_ys)
 
     def __len__(self):
         return self.labels.shape[0] - self.window
