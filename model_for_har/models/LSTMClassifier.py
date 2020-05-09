@@ -1,45 +1,59 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
+from torch.autograd import Variable
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 class LSTMClassifier(nn.Module):
-    """Very simple implementation of LSTM-based time-series classifier."""
 
-    def __init__(self, input_dim, hidden_dim, num_layers_lstm, out_classes_num, dropout=0.0, bidirectional=False):
-        super().__init__()
+    def __init__(self, in_dim, hidden_dim, num_layers, dropout, bidirectional, num_classes, batch_size):
+        super(LSTMClassifier, self).__init__()
+        self.arch = 'lstm'
         self.hidden_dim = hidden_dim
-        self.layer_dim = num_layers_lstm
+        self.batch_size = batch_size
+        self.num_dir = 2 if bidirectional else 1
+        self.num_layers = num_layers
 
-        self.lstm = nn.LSTM(input_dim, hidden_dim,
-                            num_layers=num_layers_lstm,
-                            batch_first=True,
-                            dropout=dropout,
-                            bidirectional=bidirectional)
+        self.lstm = nn.LSTM(
+            input_size=in_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            dropout=dropout,
+            bidirectional=bidirectional,
+            batch_first=True
+        )
 
-        self.hidden2label = nn.Linear(hidden_dim, out_classes_num)
+        self.hidden2label = nn.Sequential(
+            nn.Linear(hidden_dim * self.num_dir, hidden_dim),
+            nn.ReLU(True),
+            nn.Dropout(p=dropout),
+            nn.Linear(hidden_dim, hidden_dim),
+            nn.ReLU(True),
+            nn.Dropout(p=dropout),
+            nn.Linear(hidden_dim, num_classes),
+        )
 
         self.hidden = None
 
-    def forward(self, x):
+    def init_hidden(self, batch_size):
+        h0 = nn.Parameter(nn.init.xavier_uniform_(
+                torch.Tensor(self.num_dir * self.num_layers, batch_size, self.hidden_dim).type(torch.DoubleTensor)
+            ), requires_grad=True).to(device)
+
+        c0 = nn.Parameter(nn.init.xavier_uniform_(
+                torch.Tensor(self.num_dir * self.num_layers, batch_size, self.hidden_dim).type(torch.DoubleTensor)
+            ), requires_grad=True).to(device)
+
+        return h0, c0
+
+    def forward(self, x):  # x is (batch_size, sequence_size, num_of_features)
         if self.hidden is None:
             self.hidden = self.init_hidden(x.size(0))
 
-        out, _ = self.lstm(x, self.hidden)
+        # See: https://discuss.pytorch.org/t/solved-why-we-need-to-detach-variable-which-contains-hidden-representation/1426/2
+        lstm_out, _ = self.lstm(x, self.hidden)
 
-        # print("out: ", out.shape)
-        # print("out[:, -1, :]: ", out[:, -1, :].shape)
-        #
-        # print("self.hidden2label(out): ", self.hidden2label(out).shape)
-        # print("self.hidden2label(out[:, -1, :]): ", self.hidden2label(out[:, -1, :]).shape)
+        y = self.hidden2label(lstm_out[:, -1, :])
 
-        out = self.hidden2label(out)
-        return out
-
-    def init_hidden(self, batch_size):
-        h0 = torch.zeros(self.layer_dim, batch_size, self.hidden_dim).double().to(device)
-        c0 = torch.zeros(self.layer_dim, batch_size, self.hidden_dim).double().to(device)
-
-        return h0, c0
+        return y

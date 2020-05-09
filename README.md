@@ -1,66 +1,15 @@
 # Human Activity Recognition (HAR) based on WiFi CSI data
 
-One Paragraph of project description goes here
+This is a repository with source code for thesis "Human Activity Recognition (HAR) based on WiFi CSI data"
 
-Link to the thesis: ...
+Using Wi-Fi Channel State Information (CSI) is a novel way of sensing and hu-man activity recognition (HAR). Such a system can be used in medical institutions for their patients monitoring without privacy violence, as it could be with a vision-based approach.
 
-## Getting Started
-
-How to setup WiFi routers
-
-RecvData, SendData compilation
-
-How to run on routers
-
-How to run visualization and data retrieval script
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+The main goal of this thesis was to explore current methods and systems whichuse Wi-Fi CSI, conduct experiments to analyze how different hardware configura-tions affect the data and possibility to detect human activity, collect the dataset andbuild the classification model for HAR task. 8 experiments were performed, the dataset in 3 different rooms was collected, and LSTM-based classification model was build and trained.  We’ve shown the full pipeline of building Wi-Fi CSI based system. 
 
 
-### Installing
+## Dataset
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-
-### Dataset
-
-How it was collected? Some info about it...
-
-Links to the dataset 
-
-### Experiments
-
-General info about experiments
-
-Links to experiments
-
-### Results
-
-Some info about results...
-
-charts, plots, ...
+The dataset can be downloaded by the following [link](https://drive.google.com/file/d/1geOFNDn-Q_K4R5W-ECHj7D__bU96_j2v/view?usp=sharing).
 
 ## Contributing
 
@@ -68,15 +17,16 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Authors
 
-* **Andrew Zhuravchak** - [Andrew](https://github.com/Retsedivs)
-
+* **[Andrew Zhuravchak](https://github.com/Retsedivs)** - Ukrainian Catholic University(UCU) student
+* **Oleh Kapshii** - supervisor
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
 * This repository is a fork from the [Atheros-CSI-Tool-UserSpace-APP](https://github.com/NovelSense/Atheros-CSI-Tool-UserSpace-APP) 
   which is based on [Atheros-CSI-Tool](https://github.com/xieyaxiongfly/Atheros-CSI-Tool).
 * [RF-pose](http://rfpose.csail.mit.edu/) for inspiration for doing this work
+* Cypress Semiconductor company, ASR Ukraine team and especially Oleh Kapshii for support and help

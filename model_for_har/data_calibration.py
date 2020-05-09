@@ -1,4 +1,6 @@
+import pandas as pd
 import numpy as np
+import pywt
 
 
 def calibrate_single_phase(phases):
@@ -72,3 +74,40 @@ def calibrate_amplitude(amplitudes, rssi=1):
 def calibrate_amplitude_custom(amplitudes, min_val, max_val, rssi=1):
     amplitudes = np.array(amplitudes)
     return ((amplitudes - min_val) / (max_val - min_val)) * rssi
+
+
+def dwn_noise(vals):
+    data = vals.copy()
+    threshold = 0.06  # Threshold for filtering
+
+    w = pywt.Wavelet('sym5')
+    maxlev = pywt.dwt_max_level(data.shape[0], w.dec_len)
+
+    coeffs = pywt.wavedec(data, 'sym5', level=maxlev)
+
+    for i in range(1, len(coeffs)):
+        coeffs[i] = pywt.threshold(coeffs[i], threshold * max(coeffs[i]))
+
+    datarec = pywt.waverec(coeffs, 'sym5')
+    # print("datarec: ", datarec.shape)
+
+    return datarec
+
+
+def hampel(vals_orig, k=7, t0=3):
+    # Make copy so original not edited
+    # print("vals: ", vals_orig.shape)
+    vals = pd.Series(vals_orig.copy())
+
+    # Hampel Filter
+    L = 1.4826
+
+    rolling_median = vals.rolling(k).median()
+    difference = np.abs(rolling_median - vals)
+    median_abs_deviation = difference.rolling(k).median()
+    threshold = t0 * L * median_abs_deviation
+    outlier_idx = difference > threshold
+    vals[outlier_idx] = rolling_median
+
+    # print("vals: ", vals.shape)
+    return vals.to_numpy()

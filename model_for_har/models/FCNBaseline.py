@@ -30,8 +30,13 @@ class FCNBaseline(nn.Module):
             ConvBlock(128, 256, 5, 1),
             ConvBlock(256, 128, 3, 1),
         ])
-        self.final = nn.Linear(128, num_pred_classes)
+        self.final = nn.Linear(256, num_pred_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore
         x = self.layers(x)
-        return self.final(x.mean(dim=-1))
+        # return self.final(x.mean(dim=-1))
+        print("X: ", x.shape)
+        print("X: ", x.mean(dim=-1).shape)
+        print("X: ", x.mean(dim=0).shape)
+        print("X: ", x.mean(dim=1).shape)
+        return self.final(x)

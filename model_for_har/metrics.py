@@ -8,21 +8,23 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def get_train_metric(model, dl, criterion, BATCH_SIZE):
     model.eval()
-    # h = model.init_hidden(BATCH_SIZE)
 
     correct, total, total_loss = 0, 0, 0
 
+    model.hidden = model.init_hidden(BATCH_SIZE)
     for x_val, y_val in tqdm(dl, total=len(dl), desc="Validation epoch: "):
         if x_val.size(0) != BATCH_SIZE:
             continue
 
+        model.init_hidden(x_val.size(0))
         x_val, y_val = x_val.double().to(device), y_val.double().to(device)
 
         out = model(x_val)
-        # loss = criterion(out, y_val.long())
 
-        out = out.view(out.size(0) * out.size(1), out.size(2))
-        y_val = y_val.view(y_val.size(0) * y_val.size(1))
+        # out = out.view(out.size(0) * out.size(1), out.size(2))
+        # y_val = y_val.view(y_val.size(0) * y_val.size(1))
+        # print("y_val.size(0): ", y_val.size())
+
         loss = criterion(out, y_val.long())
 
         total_loss += loss.item()
