@@ -14,7 +14,7 @@ netifaces==0.10.4
 networkx==2.4
 numpy==1.18.1
 opencv-python-headless==4.1.2.30
-Pillow==6.2.1
+Pillow==8.1.1
 pyparsing==2.4.5
 pyqtgraph==0.10.0
 pyRFC3339==1.0
