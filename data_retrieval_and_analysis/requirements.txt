@@ -24,5 +24,5 @@ system-service==0.3
 systemd-python==234
 tqdm==4.40.2
 ufw==0.36
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==16.6.1
