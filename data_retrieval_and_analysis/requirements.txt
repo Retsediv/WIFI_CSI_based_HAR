@@ -13,7 +13,7 @@ munch==2.5.0
 netifaces==0.10.4
 networkx==2.4
 numpy==1.18.1
-opencv-python-headless==4.1.2.30
+opencv-python-headless==4.2.0.32
 Pillow==8.3.2
 pyparsing==2.4.5
 pyqtgraph==0.10.0
