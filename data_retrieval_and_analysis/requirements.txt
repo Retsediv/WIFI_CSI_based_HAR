@@ -1,5 +1,5 @@
 
-httplib2==0.9.2
+httplib2==0.19.0
 idna==2.8
 imageio==2.6.1
 imgaug==0.2.6
@@ -13,8 +13,8 @@ munch==2.5.0
 netifaces==0.10.4
 networkx==2.4
 numpy==1.18.1
-opencv-python-headless==4.1.2.30
-Pillow==6.2.1
+opencv-python-headless==4.2.0.32
+Pillow==8.3.2
 pyparsing==2.4.5
 pyqtgraph==0.10.0
 pyRFC3339==1.0
@@ -24,5 +24,5 @@ system-service==0.3
 systemd-python==234
 tqdm==4.40.2
 ufw==0.36
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==16.6.1
