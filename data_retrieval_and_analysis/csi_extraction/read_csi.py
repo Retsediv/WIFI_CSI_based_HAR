@@ -18,9 +18,7 @@
 
 import io
 import struct
-import logging
-from math import atan2, atan
-import numpy as np
+from math import atan2
 
 BITS_PER_BYTE = 8
 BITS_PER_SYMBOL = 10
@@ -49,7 +47,8 @@ def unpack_csi_struct(f, endianess='>'):  # Big-Endian as Default Value
     csi_inf.rssi1 = struct.unpack(endianess + 'B', f.read(1))[0]  # rssi1          1Byte
     csi_inf.rssi2 = struct.unpack(endianess + 'B', f.read(1))[0]  # rssi2          1Byte
     csi_inf.rssi3 = struct.unpack(endianess + 'B', f.read(1))[0]  # rssi3          1Byte
-    csi_inf.payload_len = struct.unpack(endianess + 'H', f.read(2))[0]  # payload_len    2Byte Total: 27Byte + csi_len + payload_len
+    csi_inf.payload_len = struct.unpack(endianess + 'H', f.read(2))[
+        0]  # payload_len    2Byte Total: 27Byte + csi_len + payload_len
 
     if csi_inf.csi_len > 0:
         csi_buf = f.read(csi_inf.csi_len)  # csi        csi_len

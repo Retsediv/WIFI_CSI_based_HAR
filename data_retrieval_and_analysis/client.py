@@ -16,9 +16,8 @@
 # information or reproduction of this material is strictly forbidden
 # unless prior written permission is obtained from NovelSense UG.
 # ------------------------------------------------------------------------------------------
-import socket  # Import socket module
-import time
 import os
+import socket  # Import socket module
 import struct
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -16,9 +16,8 @@
 # unless prior written permission is obtained from NovelSense UG.
 # ------------------------------------------------------------------------------------------
 
-import struct
 import os
-import logging
+
 from .read_csi import *
 
 
@@ -59,5 +58,6 @@ def read_log_file(filename, ignore_endian=0, endian="", check_tones=1):
 if __name__ == "__main__":
     file = read_log_file("../../Sandip_Tests/csi.dat")
     print("Done reading")
+
     for struct in file:
         print(struct.channel)
