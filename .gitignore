@@ -1,5 +1,3 @@
-./sendData/bin/*
-
 # Data
 dataset
 ./data_retrieval_and_analysis/dataset
@@ -9,6 +7,7 @@ dataset
 *.d
 
 # Binary folders
+./router/*/bin/*
 ./*/bin
 ./*/bin/*
 
