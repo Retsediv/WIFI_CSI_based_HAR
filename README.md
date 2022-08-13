@@ -1,6 +1,8 @@
-# Human Activity Recognition (HAR) based on WiFi CSI data
+# Human Activity Recognition based on Wi-Fi CSI Data - A Deep Neural Network Approach
 
-This is a repository with source code for thesis "Human Activity Recognition (HAR) based on WiFi CSI data"
+This is a repository with source code for the [paper "Human Activity Recognition based on Wi-Fi CSI Data - A Deep Neural Network Approach"](https://www.sciencedirect.com/science/article/pii/S1877050921024509) 
+and respective [thesis](https://s3.eu-central-1.amazonaws.com/ucu.edu.ua/wp-content/uploads/sites/8/2021/07/Zhuravchak-Andrii_188586_assignsubmission_file_Bachelor_Thesis_Human_Activity_Recognition_based_on_WiFi_CSI_data.pdf)
+(it contains more details that are not covered in the paper).
 
 Using Wi-Fi Channel State Information (CSI) is a novel way of sensing and human activity recognition (HAR). Such a
 system can be used in medical institutions for their patients monitoring without privacy violence, as it could be with a
@@ -12,13 +14,24 @@ dataset and build the classification model for HAR task. 8 experiments were perf
 was collected, and LSTM-based classification model was build and trained. We’ve shown the full pipeline of building
 Wi-Fi CSI based system.
 
+## Repository structure
+
+- `router` - contains source code for `sendData` and `recvCSI`. 
+They are used to send data packet from one router and calculate the CSI data on another. 
+Then `recvCSI` sends the data to a user computer via UDP connection for further processing.
+
+- `data_retrieval` - ...
+
+- `model` - ...
+
+
 ## Dataset
 
 The dataset can be downloaded by the following [link](https://doi.org/10.6084/m9.figshare.14386892.v1).
 
 ## Authors
 
-* **[Andrew Zhuravchak](https://github.com/Retsediv)** - Ukrainian Catholic University(UCU) student
+* **[Andrew Zhuravchak](https://github.com/Retsediv)** - Ukrainian Catholic University (UCU) former student
 * **Oleh Kapshii** - supervisor
 
 ## License

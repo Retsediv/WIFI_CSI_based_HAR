@@ -1,21 +1,3 @@
-#!/usr/bin/python -i
-# @file read_log_file.py
-#
-# @brief Reading logfiles created by userspace tool
-#
-#
-# Copyright 2017 NovelSense UG
-# Authors: Niklas Saenger
-#
-# NOTICE: All information contained herein is, and remains the
-# property of NovelSense UG and its suppliers, if any.  The
-# intellectual and technical concepts contained herein are
-# proprietary to NovelSense UG and its suppliers, and are protected
-# by trade secret or copyright law. Dissemination of this
-# information or reproduction of this material is strictly forbidden
-# unless prior written permission is obtained from NovelSense UG.
-# ------------------------------------------------------------------------------------------
-
 import os
 
 from .read_csi import *
