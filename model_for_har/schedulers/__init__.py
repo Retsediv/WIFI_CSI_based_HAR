@@ -1,1 +1,0 @@
-from .CycleLR import CyclicLR, cosine
