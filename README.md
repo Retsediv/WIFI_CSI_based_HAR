@@ -20,9 +20,13 @@ Wi-Fi CSI based system.
 They are used to send data packet from one router and calculate the CSI data on another. 
 Then `recvCSI` sends the data to a user computer via UDP connection for further processing.
 
-- `data_retrieval` - ...
+- `data_retrieval` - contains a program (`run_visualization_server.py`) that listens to `recvCSI` program, 
+visualizes incoming data, and saves it to a file. Also, it has a script for a dummy server to emulate incoming data from
+the router (`run_test_client.py`) and a sample CSI data in binary format as it is coming from the router 
+(`data/sample_csi_packet_big_endian.dat`). 
 
-- `model` - ...
+- `model` - has all the code for building the model and training it, scripts that were used to label activities,
+notebook for EDA, etc.
 
 
 ## Dataset
