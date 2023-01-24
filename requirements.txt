@@ -1,4 +1,4 @@
-torch==1.12.1
+torch==1.13.1
 numpy==1.23.1
 pandas==1.4.3
 opencv-python==4.6.0.66
