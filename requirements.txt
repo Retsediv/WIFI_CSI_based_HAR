@@ -1,7 +1,7 @@
 torch==2.8.0
 numpy==1.23.1
 pandas==1.4.3
-opencv-python==4.6.0.66
+opencv-python==4.8.1.78
 PyQt6==6.3.1
 pyqtgraph==0.12.4
 altair==4.2.0
